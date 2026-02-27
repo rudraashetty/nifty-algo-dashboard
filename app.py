@@ -24,8 +24,14 @@ app_mode = st.sidebar.radio("Select Module:", ["Live Intraday Tracker", "Backtes
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("Alert Settings")
-discord_url = st.sidebar.text_input("Discord Webhook URL", type="password")
 
+# 1. This looks for the secret you saved in the Cloud settings first
+cloud_secret = st.secrets.get("DISCORD_WEBHOOK_URL", "")
+
+# 2. This shows the input box, pre-filled with your secret URL
+discord_url = st.sidebar.text_input("Discord Webhook URL", value=cloud_secret, type="password")
+
+# 3. If there is a URL (from the secret or typed in), show the button
 if discord_url:
     notifier.webhook_url = discord_url
     if st.sidebar.button("🔔 Send Test Alert"):
