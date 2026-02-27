@@ -43,7 +43,21 @@ if discord_url:
     if st.sidebar.button("🔔 Send Test Alert"):
         notifier.send_alert("🤖 Dev Canvas Trading Bot is successfully connected!")
         st.sidebar.success("Test alert sent to Discord!")
+import segno
+import io
 
+st.sidebar.markdown("---")
+st.sidebar.subheader("Share App")
+
+# 1. Create the QR code linking to your current URL
+# (Streamlit automatically knows its own URL)
+app_url = "https://nifty-algo-dashboard-hmnn6kvm3sjpw4us6gbvmo.streamlit.app/" # Replace with your actual URL
+qr = segno.make(app_url)
+
+# 2. Save it to a buffer so Streamlit can display it
+buf = io.BytesIO()
+qr.save(buf, kind='png', scale=4)
+st.sidebar.image(buf.getvalue(), caption="Scan to open on Mobile")
 def plot_advanced_chart(df: pd.DataFrame, ticker: str):
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.05, 
                         row_heights=[0.6, 0.2, 0.2], subplot_titles=(f"{ticker} Price", "RSI (14)", "MACD"))
