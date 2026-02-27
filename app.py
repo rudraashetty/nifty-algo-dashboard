@@ -58,6 +58,26 @@ qr = segno.make(app_url)
 buf = io.BytesIO()
 qr.save(buf, kind='png', scale=4)
 st.sidebar.image(buf.getvalue(), caption="Scan to open on Mobile")
+st.sidebar.markdown("---")
+st.sidebar.subheader("⚖️ Risk Calculator")
+
+# 1. User Inputs for Risk Management
+capital = st.sidebar.number_input("Total Trading Capital (₹)", value=100000, step=1000)
+risk_percent = st.sidebar.slider("Risk per Trade (%)", 0.5, 5.0, 1.0)
+entry_price = st.sidebar.number_input("Entry Price (₹)", value=0.0)
+stop_loss = st.sidebar.number_input("Stop Loss (₹)", value=0.0)
+
+# 2. Logic to calculate quantity
+if entry_price > 0 and stop_loss > 0 and entry_price > stop_loss:
+    amount_to_risk = capital * (risk_percent / 100)
+    risk_per_share = entry_price - stop_loss
+    quantity = int(amount_to_risk / risk_per_share)
+    
+    st.sidebar.success(f"Risk Amount: ₹{amount_to_risk:.2f}")
+    st.sidebar.info(f"Recommended Quantity: {quantity} shares")
+    st.sidebar.warning(f"Total Trade Value: ₹{quantity * entry_price:.2f}")
+elif entry_price <= stop_loss and entry_price > 0:
+    st.sidebar.error("Stop Loss must be below Entry Price for a Buy trade.")
 def plot_advanced_chart(df: pd.DataFrame, ticker: str):
     fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.05, 
                         row_heights=[0.6, 0.2, 0.2], subplot_titles=(f"{ticker} Price", "RSI (14)", "MACD"))
