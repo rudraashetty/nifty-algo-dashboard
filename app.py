@@ -19,6 +19,19 @@ st.markdown(f"""
         <p style="font-size: 1.2em; color: #888;">Developed by <b>Rudra Shetty</b> | Intelligent Market Analysis</p>
     </div>
 """, unsafe_allow_html=True)
+# --- THEME SELECTION ---
+theme_choice = st.sidebar.select_slider(
+    "Select Dashboard Theme",
+    options=["Professional Dark", "Light Mode"],
+    value="Professional Dark"
+)
+
+if theme_choice == "Professional Dark":
+    st.markdown("""
+        <style>
+        .stApp { background-color: #0E1117; color: white; }
+        </style>
+    """, unsafe_allow_html=True)
 @st.cache_resource
 def init_modules():
     return DataFetcher(), DiscordNotifier(webhook_url=""), PredictiveModel()
