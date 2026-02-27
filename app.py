@@ -63,32 +63,36 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
     fig.update_layout(height=800, template="plotly_dark", xaxis_rangeslider_visible=False)
     st.plotly_chart(fig, use_container_width=True)
 
-
 if app_mode == "Live Intraday Tracker":
     st.title("🔴 Live Intraday Tracker")
     
-    # New Dropdown for Assets
+    # 1. New Dropdown for Assets
     ticker_choice = st.selectbox("Select Asset", 
                                 ["NIFTY 50 (^NSEI)", "RELIANCE (RELIANCE.NS)", "TCS (TCS.NS)", "HDFC BANK (HDFCBANK.NS)"])
     
-    # This logic extracts just the symbol (like ^NSEI or RELIANCE.NS)
+    # 2. Extract the symbol correctly
     selected_ticker = ticker_choice.split("(")[1].replace(")", "")
+    
     timeframe = st.selectbox("Interval", ["1m", "5m", "15m", "30m", "1h"], index=1)
     
     if st.button("Refresh Market Data"):
-        with st.spinner("Fetching Live Data..."):
-          raw_df = fetcher.fetch_live_data(ticker=selected_ticker, interval=timeframe)
+        with st.spinner(f"Fetching Live Data for {selected_ticker}..."):
+            # Use the selected_ticker variable here
+            raw_df = fetcher.fetch_live_data(ticker=selected_ticker, interval=timeframe)
+            
+            # The code below must be indented exactly 12 spaces (3 tabs) from the left
             if raw_df is not None and not raw_df.empty:
                 df = TechnicalIndicators.add_all_indicators(raw_df)
                 latest = df.iloc[-1]
                 
+                # Metrics Display
                 m1, m2, m3, m4 = st.columns(4)
                 m1.metric("Current Price", f"₹{latest['Close']:.2f}")
                 m2.metric("RSI (14)", f"{latest.get('RSI_14', 50):.2f}")
                 m3.metric("MACD", f"{latest.get('MACD', 0):.2f}")
                 m4.metric("AI Bullish Confidence", f"{ml_model.predict_confidence(df)}%")
                 
-                plot_advanced_chart(df, "NIFTY 50")
+                plot_advanced_chart(df, ticker_choice.split(" (")[0])
                 
                 rsi_val = latest.get('RSI_14', 50)
                 if pd.notna(rsi_val):
