@@ -1,0 +1,116 @@
+import streamlit as st
+import pandas as pd
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from datetime import datetime
+
+try:
+    from database import db_manager
+    from trading_logic import DataFetcher, TechnicalIndicators, BacktestEngine, DiscordNotifier, PredictiveModel
+except ImportError as e:
+    st.error(f"Critical Dependency Error: {e}")
+    st.stop()
+
+st.set_page_config(page_title="NIFTY 50 Algo Dashboard", layout="wide", page_icon="📈")
+
+@st.cache_resource
+def init_modules():
+    return DataFetcher(), DiscordNotifier(webhook_url=""), PredictiveModel()
+
+fetcher, notifier, ml_model = init_modules()
+
+st.sidebar.title("System Navigation")
+app_mode = st.sidebar.radio("Select Module:", ["Live Intraday Tracker", "Backtesting Engine", "Signal Database"])
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("Alert Settings")
+discord_url = st.sidebar.text_input("Discord Webhook URL", type="password")
+
+if discord_url:
+    notifier.webhook_url = discord_url
+    if st.sidebar.button("🔔 Send Test Alert"):
+        notifier.send_alert("🤖 Dev Canvas Trading Bot is successfully connected!")
+        st.sidebar.success("Test alert sent to Discord!")
+
+def plot_advanced_chart(df: pd.DataFrame, ticker: str):
+    fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.05, 
+                        row_heights=[0.6, 0.2, 0.2], subplot_titles=(f"{ticker} Price", "RSI (14)", "MACD"))
+
+    fig.add_trace(go.Candlestick(x=df['Datetime'], open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'], name="Price"), row=1, col=1)
+    
+    if 'RSI_14' in df.columns:
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['RSI_14'].fillna(50), name="RSI", line=dict(color='purple')), row=2, col=1)
+        fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
+        fig.add_hline(y=30, line_dash="dash", line_color="green", row=2, col=1)
+
+    if 'MACD' in df.columns and 'MACD_Signal' in df.columns:
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['MACD'].fillna(0), name="MACD", line=dict(color='blue')), row=3, col=1)
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['MACD_Signal'].fillna(0), name="Signal", line=dict(color='orange')), row=3, col=1)
+        fig.add_trace(go.Bar(x=df['Datetime'], y=df['MACD_Hist'].fillna(0), name="Histogram"), row=3, col=1)
+
+    fig.update_layout(height=800, template="plotly_dark", xaxis_rangeslider_visible=False)
+    st.plotly_chart(fig, use_container_width=True)
+
+if app_mode == "Live Intraday Tracker":
+    st.title("🔴 Live Intraday Tracker: NIFTY 50")
+    timeframe = st.selectbox("Interval", ["1m", "5m", "15m", "30m", "1h"], index=1)
+    
+    if st.button("Refresh Market Data"):
+        with st.spinner("Fetching Live Data..."):
+            raw_df = fetcher.fetch_live_data(interval=timeframe)
+            if raw_df is not None and not raw_df.empty:
+                df = TechnicalIndicators.add_all_indicators(raw_df)
+                latest = df.iloc[-1]
+                
+                m1, m2, m3, m4 = st.columns(4)
+                m1.metric("Current Price", f"₹{latest['Close']:.2f}")
+                m2.metric("RSI (14)", f"{latest.get('RSI_14', 50):.2f}")
+                m3.metric("MACD", f"{latest.get('MACD', 0):.2f}")
+                m4.metric("AI Bullish Confidence", f"{ml_model.predict_confidence(df)}%")
+                
+                plot_advanced_chart(df, "NIFTY 50")
+                
+                rsi_val = latest.get('RSI_14', 50)
+                if pd.notna(rsi_val):
+                    if rsi_val > 70:
+                        st.warning("⚠️ Overbought Signal Detected!")
+                        db_manager.log_signal("NIFTY50", "SELL", latest['Close'], timeframe, {"RSI": rsi_val})
+                        notifier.send_alert(f"🔴 *SELL ALERT* NIFTY50\nPrice: ₹{latest['Close']}\nRSI: {rsi_val:.2f}")
+                    elif rsi_val < 30:
+                        st.success("✅ Oversold Signal Detected!")
+                        db_manager.log_signal("NIFTY50", "BUY", latest['Close'], timeframe, {"RSI": rsi_val})
+                        notifier.send_alert(f"🟢 *BUY ALERT* NIFTY50\nPrice: ₹{latest['Close']}\nRSI: {rsi_val:.2f}")
+            else:
+                st.error("Failed to fetch market data.")
+
+elif app_mode == "Backtesting Engine":
+    st.title("⚙️ Algorithmic Backtesting Engine")
+    col1, col2 = st.columns(2)
+    start_date = col1.date_input("Start Date", datetime(2023, 1, 1))
+    end_date = col2.date_input("End Date", datetime.now())
+    
+    if st.button("Run Backtest"):
+        with st.spinner("Crunching historical data..."):
+            hist_df = fetcher.fetch_historical_data(start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
+            if hist_df is not None:
+                df_with_inds = TechnicalIndicators.add_all_indicators(hist_df)
+                results = BacktestEngine.run_macd_crossover(df_with_inds)
+                
+                st.subheader("Results (MACD Crossover)")
+                r1, r2, r3, r4 = st.columns(4)
+                r1.metric("Total Trades", results['total_trades'])
+                r2.metric("Win Rate", f"{results['win_rate']}%")
+                r3.metric("Max Drawdown", f"{results['max_drawdown']}%")
+                r4.metric("Total Return", f"{results['total_return']}%")
+                
+                db_manager.log_backtest_result("MACD Crossover", "NIFTY50", "1d", results['total_trades'], results['win_rate'], results['max_drawdown'], results['total_return'])
+
+elif app_mode == "Signal Database":
+    st.title("🗄️ SQL Database Logs")
+    tab1, tab2 = st.tabs(["Recent Signals", "Backtest History"])
+    with tab1:
+        signals = db_manager.get_recent_signals()
+        if signals: st.dataframe(pd.DataFrame([s.to_dict() for s in signals]), use_container_width=True)
+    with tab2:
+        logs = db_manager.get_backtest_history()
+        if logs: st.dataframe(pd.DataFrame([l.to_dict() for l in logs]), use_container_width=True)
