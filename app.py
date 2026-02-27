@@ -12,7 +12,13 @@ except ImportError as e:
     st.stop()
 
 st.set_page_config(page_title="NIFTY 50 Algo Dashboard", layout="wide", page_icon="📈")
-
+# --- CUSTOM HEADER & BRANDING ---
+st.markdown(f"""
+    <div style="text-align: center; padding: 10px; border-bottom: 2px solid #4CAF50; margin-bottom: 30px;">
+        <h1 style="color: #4CAF50; margin-bottom: 0;">Dev Canvas Trading Engine</h1>
+        <p style="font-size: 1.2em; color: #888;">Developed by <b>Yajna Shetty</b> | Intelligent NIFTY 50 Analysis</p>
+    </div>
+""", unsafe_allow_html=True)
 @st.cache_resource
 def init_modules():
     return DataFetcher(), DiscordNotifier(webhook_url=""), PredictiveModel()
@@ -57,13 +63,21 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
     fig.update_layout(height=800, template="plotly_dark", xaxis_rangeslider_visible=False)
     st.plotly_chart(fig, use_container_width=True)
 
+
 if app_mode == "Live Intraday Tracker":
-    st.title("🔴 Live Intraday Tracker: NIFTY 50")
+    st.title("🔴 Live Intraday Tracker")
+    
+    # New Dropdown for Assets
+    ticker_choice = st.selectbox("Select Asset", 
+                                ["NIFTY 50 (^NSEI)", "RELIANCE (RELIANCE.NS)", "TCS (TCS.NS)", "HDFC BANK (HDFCBANK.NS)"])
+    
+    # This logic extracts just the symbol (like ^NSEI or RELIANCE.NS)
+    selected_ticker = ticker_choice.split("(")[1].replace(")", "")
     timeframe = st.selectbox("Interval", ["1m", "5m", "15m", "30m", "1h"], index=1)
     
     if st.button("Refresh Market Data"):
         with st.spinner("Fetching Live Data..."):
-            raw_df = fetcher.fetch_live_data(interval=timeframe)
+          raw_df = fetcher.fetch_live_data(ticker=selected_ticker, interval=timeframe)
             if raw_df is not None and not raw_df.empty:
                 df = TechnicalIndicators.add_all_indicators(raw_df)
                 latest = df.iloc[-1]
