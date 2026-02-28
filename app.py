@@ -185,3 +185,43 @@ elif app_mode == "Signal Database":
     with tab2:
         logs = db_manager.get_backtest_history()
         if logs: st.dataframe(pd.DataFrame([l.to_dict() for l in logs]), use_container_width=True)
+# --- ADVANCED TECHNICAL INDICATORS (Professional Upgrade) ---
+class TechnicalIndicators:
+    @staticmethod
+    def add_rsi(df, window=14):
+        delta = df['Close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
+        rs = gain / loss
+        df['RSI_14'] = 100 - (100 / (1 + rs))
+        return df
+
+    @staticmethod
+    def add_macd(df):
+        exp1 = df['Close'].ewm(span=12, adjust=False).mean()
+        exp2 = df['Close'].ewm(span=26, adjust=False).mean()
+        df['MACD'] = exp1 - exp2
+        df['Signal_Line'] = df['MACD'].ewm(span=9, adjust=False).mean()
+        return df
+
+    @staticmethod
+    def add_bollinger_bands(df, window=20, num_std=2):
+        rolling_mean = df['Close'].rolling(window=window).mean()
+        rolling_std = df['Close'].rolling(window=window).std()
+        df['BB_Middle'] = rolling_mean
+        df['BB_Upper'] = rolling_mean + (rolling_std * num_std)
+        df['BB_Lower'] = rolling_mean - (rolling_std * num_std)
+        return df
+
+    @staticmethod
+    def add_volume_ma(df, window=20):
+        df['Vol_MA'] = df['Volume'].rolling(window=window).mean()
+        return df
+
+    @classmethod
+    def add_all_indicators(cls, df):
+        df = cls.add_rsi(df)
+        df = cls.add_macd(df)
+        df = cls.add_bollinger_bands(df)
+        df = cls.add_volume_ma(df)
+        return df
