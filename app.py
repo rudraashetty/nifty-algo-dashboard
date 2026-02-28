@@ -115,9 +115,9 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
             showlegend=True
         ), row=1, col=1)
         if 'RSI_14' in df.columns:
-        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['RSI_14'].fillna(50), name="RSI", line=dict(color='purple')), row=2, col=1)
-        fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
-        fig.add_hline(y=30, line_dash="dash", line_color="green", row=2, col=1)
+            fig.add_trace(go.Scatter(x=df['Datetime'], y=df['RSI_14'].fillna(50), name="RSI", line=dict(color='purple')), row=2, col=1)
+            fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
+            fig.add_hline(y=30, line_dash="dash", line_color="green", row=2, col=1)
 
     if 'MACD' in df.columns and 'MACD_Signal' in df.columns:
         fig.add_trace(go.Scatter(x=df['Datetime'], y=df['MACD'].fillna(0), name="MACD", line=dict(color='blue')), row=3, col=1)
