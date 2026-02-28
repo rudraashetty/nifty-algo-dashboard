@@ -84,7 +84,7 @@ class DatabaseManager:
                 engine_kwargs["max_overflow"] = 10
 
             self.engine = create_engine(self.database_url, **engine_kwargs)
-            self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+            self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine, expire_on_commit=False)
             Base.metadata.create_all(bind=self.engine)
             logger.info("Database initialized successfully.")
         except Exception as e:
