@@ -91,7 +91,13 @@ if entry_price > 0 and stop_loss > 0 and entry_price > stop_loss:
     st.sidebar.warning(f"Total Trade Value: ₹{quantity * entry_price:.2f}")
 elif entry_price <= stop_loss and entry_price > 0:
     st.sidebar.error("Stop Loss must be below Entry Price for a Buy trade.")
-
+# --- Strategy Key (Add at Line 94) ---
+with st.sidebar.expander("📊 Strategy Key"):
+    st.markdown("""
+    **Bullish Crossover (Green Arrow):** The MACD line crossed above the Signal line. This indicates rising momentum.
+    
+    **Bearish Crossover (Red Arrow):** The MACD line crossed below the Signal line. This indicates falling momentum.
+    """)
 # --- THE CHARTING FUNCTION (MUST HAVE ZERO INDENTATION) ---
 def plot_advanced_chart(df: pd.DataFrame, ticker: str):
     fig = make_subplots(
