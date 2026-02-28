@@ -120,11 +120,14 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
         fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
         fig.add_hline(y=30, line_dash="dash", line_color="green", row=2, col=1)
 
-    # 4. MACD
+# 4. MACD (Ensure column name matches TechnicalIndicators class)
     if 'MACD' in df.columns:
         fig.add_trace(go.Scatter(x=df['Datetime'], y=df['MACD'].fillna(0), name="MACD", line=dict(color='blue')), row=3, col=1)
-        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['Signal_Line'].fillna(0), name="Signal", line=dict(color='orange')), row=3, col=1)
-
+        
+        # Change 'Signal_Line' here if your class uses 'MACD_Signal'
+        signal_col = 'Signal_Line' if 'Signal_Line' in df.columns else 'MACD_Signal'
+        if signal_col in df.columns:
+            fig.add_trace(go.Scatter(x=df['Datetime'], y=df[signal_col].fillna(0), name="Signal", line=dict(color='orange')), row=3, col=1)
     fig.update_layout(height=800, template="plotly_dark", xaxis_rangeslider_visible=False, showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
