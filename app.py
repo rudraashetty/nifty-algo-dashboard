@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+from textblob import TextBlob
 from plotly.subplots import make_subplots
 from datetime import datetime
 
@@ -90,20 +91,29 @@ if entry_price > 0 and stop_loss > 0 and entry_price > stop_loss:
     st.sidebar.warning(f"Total Trade Value: ₹{quantity * entry_price:.2f}")
 elif entry_price <= stop_loss and entry_price > 0:
     st.sidebar.error("Stop Loss must be below Entry Price for a Buy trade.")
-# --- MANUAL DATABASE TEST (Add at Line 93) ---
-st.sidebar.markdown("---")
-if st.sidebar.button("🧪 Log Test Signal"):
-    try:
-        db_manager.log_signal(
-            ticker="NIFTY 50",
-            signal_type="BUY",
-            price=25181.80,
-            timeframe="5m"
-        )
-        st.sidebar.success("Test signal logged!")
-        st.rerun()
-    except Exception as e:
-        st.sidebar.error(f"Test Log Failed: {e}")
+
+# --- UPDATED MANUAL DATABASE TEST (Line 93) ---
+        st.sidebar.markdown("---")
+        if st.sidebar.button("🧪 Log Test Signal"):
+            try:
+                # 1. Define a test market headline
+                test_headline = "NIFTY-50 hits record high as global markets rally on positive earnings."
+                
+                # 2. Calculate AI Sentiment Score using our new function
+                score = get_market_sentiment(test_headline)
+                
+                # 3. Log to database with the new sentiment_score field
+                db_manager.log_signal(
+                    ticker="NIFTY 50",
+                    signal_type="BUY",
+                    price=25181.80,
+                    sentiment=score, # This passes the AI score to SQL
+                    timeframe="5m"
+                )
+                st.sidebar.success(f"Signal Logged! AI Mood: {score}")
+                st.rerun()
+            except Exception as e:
+                st.sidebar.error(f"Test Log Failed: {e}")
         # --- CLEAR DATABASE (Add at Line 107) ---
         st.sidebar.markdown("---")
         if st.sidebar.button("🗑️ Clear All Test Data"):
@@ -120,6 +130,19 @@ with st.sidebar.expander("📊 Strategy Key"):
     
     **Bearish Crossover (Red Arrow):** The MACD line crossed below the Signal line. This indicates falling momentum.
     """)
+    from textblob import TextBlob
+
+def get_market_sentiment(text):
+    """
+    Analyzes text and returns a score between -1.0 (Bearish) and 1.0 (Bullish).
+    """
+    if not text:
+        return 0.0
+    analysis = TextBlob(text)
+    # polarity ranges from -1 to 1
+    return round(analysis.sentiment.polarity, 2)
+
+# --- THE CHARTING FUNCTION (Existing comment will now move down) ---
 # --- THE CHARTING FUNCTION (MUST HAVE ZERO INDENTATION) ---
 def plot_advanced_chart(df: pd.DataFrame, ticker: str):
     fig = make_subplots(
