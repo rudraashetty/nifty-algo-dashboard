@@ -195,6 +195,30 @@ elif app_mode == "Signal Database":
     st.title("🗄️ SQL Database Logs")
     tab1, tab2 = st.tabs(["Recent Signals", "Backtest History"])
     with tab1:
+        # --- DAILY PERFORMANCE TRACKER (Inside Tab 1) ---
+        if signals:
+            st.markdown("---")
+            st.subheader("📈 Daily Performance Summary")
+            df_signals = pd.DataFrame([s.to_dict() for s in signals])
+            
+            # Ensure price columns are numeric for calculation
+            df_signals['price'] = pd.to_numeric(df_signals['price'])
+            
+            # Simple P/L logic based on signal type
+            # Note: This is a placeholder logic for your specific trade execution
+            total_signals = len(df_signals)
+            buy_count = len(df_signals[df_signals['type'] == 'BUY'])
+            sell_count = len(df_signals[df_signals['type'] == 'SELL'])
+            
+            p1, p2, p3 = st.columns(3)
+            p1.metric("Total Signals Logged", total_signals)
+            p2.metric("Buy Signals", buy_count, delta_color="normal")
+            p3.metric("Sell Signals", sell_count, delta_color="inverse")
+            
+            # Daily Trend Chart
+            df_signals['timestamp'] = pd.to_datetime(df_signals['timestamp'])
+            daily_counts = df_signals.resample('D', on='timestamp').size()
+            st.line_chart(daily_counts, use_container_width=True)
         signals = db_manager.get_recent_signals()
         if signals: st.dataframe(pd.DataFrame([s.to_dict() for s in signals]), use_container_width=True)
     with tab2:
