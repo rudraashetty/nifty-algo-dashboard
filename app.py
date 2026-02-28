@@ -191,11 +191,11 @@ elif app_mode == "Backtesting Engine":
                 r3.metric("Max Drawdown", f"{results['max_drawdown']}%")
                 r4.metric("Total Return", f"{results['total_return']}%")
 elif app_mode == "Signal Database":
-  st.title("🗄️ SQL Database Logs")
+    st.title("🗄️ SQL Database Logs")
     tab1, tab2 = st.tabs(["Recent Signals", "Backtest History"])
     
     with tab1:
-        # Fetch signals and convert to dictionary immediately to avoid detachment
+        # Fetch signals and convert to data immediately
         signals = db_manager.get_recent_signals()
         
         if signals:
@@ -221,10 +221,9 @@ elif app_mode == "Signal Database":
             st.info("No signals found in the database yet.")
 
     with tab2:
-        # Fetch backtest logs and convert immediately
+        # Fetch backtest logs and convert immediately to prevent DetachedInstanceError
         backtest_logs = db_manager.get_backtest_history()
         if backtest_logs:
-            # FIX: List comprehension converts all objects to data BEFORE session closes
             log_data = [l.to_dict() for l in backtest_logs]
             st.dataframe(pd.DataFrame(log_data), use_container_width=True)
         else:
