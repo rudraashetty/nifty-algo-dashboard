@@ -96,7 +96,18 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
                         row_heights=[0.6, 0.2, 0.2], subplot_titles=(f"{ticker} Price", "RSI (14)", "MACD"))
 
     fig.add_trace(go.Candlestick(x=df['Datetime'], open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'], name="Price"), row=1, col=1)
-    
+    # --- 1. ADD BOLLINGER BANDS (Overlay on Price) ---
+    if 'BB_Upper' in df.columns:
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['BB_Upper'], 
+                                 name='BB Upper', line=dict(color='rgba(173, 216, 230, 0.4)', width=1)), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['BB_Lower'], 
+                                 name='BB Lower', line=dict(color='rgba(173, 216, 230, 0.4)', width=1),
+                                 fill='tonexty', fillcolor='rgba(173, 216, 230, 0.1)'), row=1, col=1)
+
+    # --- 2. ADD VOLUME ANALYSIS (Bottom Bars) ---
+    if 'Volume' in df.columns:
+        fig.add_trace(go.Bar(x=df['Datetime'], y=df['Volume'], name='Volume', 
+                             marker_color='rgba(128, 128, 128, 0.2)'), row=1, col=1)
     if 'RSI_14' in df.columns:
         fig.add_trace(go.Scatter(x=df['Datetime'], y=df['RSI_14'].fillna(50), name="RSI", line=dict(color='purple')), row=2, col=1)
         fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
