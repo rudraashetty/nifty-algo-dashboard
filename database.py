@@ -24,6 +24,7 @@ if DATABASE_URL.startswith("postgres://"):
 Base = declarative_base()
 
 class TradingSignal(Base):
+    sentiment_score = Column(Float, nullable=True)
     __tablename__ = 'trading_signals'
     id = Column(Integer, primary_key=True, autoincrement=True)
     timestamp = Column(DateTime, nullable=False, default=datetime.now)
@@ -34,16 +35,15 @@ class TradingSignal(Base):
     indicator_values = Column(Text, nullable=True)
     status = Column(String(20), default='ACTIVE')
     
-    def to_dict(self) -> Dict[str, Any]:
-        return {
-            'id': self.id,
-            'timestamp': self.timestamp.isoformat() if self.timestamp else None,
-            'ticker': self.ticker,
-            'signal_type': self.signal_type,
-            'price': self.price,
-            'timeframe': self.timeframe,
-            'status': self.status
-        }
+   def to_dict(self):
+    return {
+        "id": self.id,
+        "ticker": self.ticker,
+        "signal_type": self.signal_type,
+        "price": self.price,
+        "sentiment_score": self.sentiment_score, # Add this line
+        "timestamp": self.timestamp.isoformat() if self.timestamp else None
+    }
 
 class BacktestLog(Base):
     __tablename__ = 'backtest_logs'
@@ -101,14 +101,16 @@ class DatabaseManager:
         finally:
             session.close()
     
-    def log_signal(self, ticker: str, signal_type: str, price: float, timeframe: str = None, indicator_values: Dict = None):
-        try:
-            with self.get_session() as session:
-                signal = TradingSignal(
-                    ticker=ticker, signal_type=signal_type.upper(), price=price,
-                    timeframe=timeframe, indicator_values=json.dumps(indicator_values) if indicator_values else None
-                )
-                session.add(signal)
+    def log_signal(self, ticker: str, signal_type: str, price: float, sentiment: float = 0.0, timeframe: str = None):
+    with self.get_session() as session:
+        signal = TradingSignal(
+            ticker=ticker, 
+            signal_type=signal_type.upper(), 
+            price=price,
+            sentiment_score=sentiment, # Add this line
+            timeframe=timeframe
+        )
+        session.add(signal)
         except SQLAlchemyError as e:
             logger.error(f"DB Log Error: {e}")
 
