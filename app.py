@@ -111,9 +111,8 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
             x=df['Datetime'], 
             y=df['Volume'], 
             name='Volume', 
-            marker_color='rgba(128, 128, 128, 0.4)', # Increased visibility
-            showlegend=True
-        ), row=1, col=1)
+            marker_color='rgba(128, 128, 128, 0.4)'
+        ), row=1, col=1, secondary_y=True) # Adding this makes the bars visible!
         if 'RSI_14' in df.columns:
             fig.add_trace(go.Scatter(x=df['Datetime'], y=df['RSI_14'].fillna(50), name="RSI", line=dict(color='purple')), row=2, col=1)
             fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
