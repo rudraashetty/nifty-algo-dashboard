@@ -95,16 +95,15 @@ st.sidebar.markdown("---")
 if st.sidebar.button("🧪 Log Test Signal"):
     try:
         db_manager.log_signal(
-             ticker="NIFTY 50",
-             signal_type="BUY",
-             price=25181.80,
-             timeframe="5m"
-       )
-       st.sidebar.success("Test signal logged!")
-       st.rerun()
-   except Exception as e:
-       st.sidebar.error(f"Test Log Failed: {e}")
-
+            ticker="NIFTY 50",
+            signal_type="BUY",
+            price=25181.80,
+            timeframe="5m"
+        )
+        st.sidebar.success("Test signal logged!")
+        st.rerun()
+    except Exception as e:
+        st.sidebar.error(f"Test Log Failed: {e}")
         # --- Strategy Key (Add at Line 94) ---
 with st.sidebar.expander("📊 Strategy Key"):
     st.markdown("""
