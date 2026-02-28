@@ -1,35 +1,39 @@
-# 📈 Dev Canvas Trading Engine
-**Developed by Rudra Shetty**
+📈 Dev Canvas Trading Engine: NIFTY-50 Intraday Analytics
+Developed by Rudra Shetty | AI & Machine Learning Specialization
 
-A professional-grade fintech dashboard for real-time NIFTY 50 analysis, algorithmic backtesting, and AI-driven market sentiment.
+A high-performance, full-stack trading dashboard built with Streamlit and SQLAlchemy for real-time intraday market analysis and automated signal logging. This engine integrates technical indicators with a robust database backend to track trading performance over time.
 
-## 🚀 Live Demo
-Access the live dashboard here: https://nifty-algo-dashboard-hmnn6kvm3sjpw4us6gbvmo.streamlit.app/#dev-canvas-trading-engine
+🚀 Key Features
+Live Intraday Tracker: Real-time Nifty-50 data visualization with automated MACD Bullish/Bearish Crossover detection.
 
-## ✨ Key Features
-* **Live Intraday Tracker**: Real-time data streaming for NIFTY 50 and major NSE stocks (RELIANCE, TCS, HDFCBANK).
-* **Algorithmic Backtesting**: Evaluate strategies like MACD Crossover using historical data from 2023-2025.
-* **AI Confidence Score**: Integrated machine learning model to predict bullish/bearish market confidence.
-* **Automated Alerts**: Secure Discord integration for 24/7 trade signal notifications.
-* **Mobile-First Design**: Includes a built-in QR code for instant mobile access and monitoring.
-* **Real-time Market Tracking**: Integrated with MACD and Bollinger Band indicators.
+Predictive Analytics: Integrated technical indicators including Bollinger Bands (20, 2) and RSI (14) for trend strength validation.
 
-* **Automated SQL Logging**: A stable database system that survives session timeouts.
+SQL Database Logs: Persistent storage for all generated signals and backtest results using PostgreSQL (Production) and SQLite (Development).
 
-* **Risk Management**: A built-in calculator for position sizing.
+Daily Performance Summary: Interactive UI cards and charts that calculate total trades, buy/sell ratios, and daily activity trends.
 
-* **Advanced Analytics**: A daily P/L and activity tracker.
+Risk Management Suite: A built-in calculator that determines optimal Position Sizing based on custom capital and risk percentages.
 
-## 🛠️ Tech Stack
-* **Language**: Python 3.11+
-* **Framework**: Streamlit (Cloud Deployment)
-* **Data**: Yahoo Finance (yfinance)
-* **Analysis**: Pandas, TA-Lib, Scikit-Learn
+💻 Technical Stack
+Frontend: Streamlit (Python-based Web Framework).
 
-## 🏗️ Installation & Setup
-1. Clone the repo: `git clone https://github.com/rudraashetty/nifty-algo-dashboard.git`
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run locally: `streamlit run app.py`
+Backend & Database: SQLAlchemy ORM for robust database session management and signal persistence.
 
----
-© 2026 **Dev Canvas** | Engineering Intelligent Markets
+Data Processing: Pandas & NumPy for vectorized technical indicator calculations.
+
+Visualization: Plotly for interactive, multi-axis candlestick charting.
+
+Real-time Data: Integrated via yfinance for high-fidelity market snapshots.
+
+🛠️ Architecture Highlights
+To ensure production stability, this engine utilizes a non-expiring database session (expire_on_commit=False) to prevent DetachedInstanceError during high-frequency data reads. It also features a "Safe-Check" data extraction layer using getattr to maintain UI stability even with evolving database schemas.
+
+📁 Project Structure
+Plaintext
+├── app.py              # Main Streamlit UI and Module Logic
+├── database.py         # SQLAlchemy Models and DatabaseManager Class
+├── trading_logic.py    # Indicator classes and Backtest Engine
+├── requirements.txt    # Project dependencies
+└── trading_dashboard.db# Local SQLite development database
+🎓 Academic & Professional Context
+This project was developed as part of my 7th-semester BE in Computer Science (AI & ML) at Mangalore Institute of Technology & Engineering (MITE). It builds upon my previous experience developing AuditFlow (Technical Debt Auditor) and NeuroVocal AI (Deep Learning for Disease Classification).
