@@ -91,31 +91,30 @@ if entry_price > 0 and stop_loss > 0 and entry_price > stop_loss:
     st.sidebar.warning(f"Total Trade Value: ₹{quantity * entry_price:.2f}")
 elif entry_price <= stop_loss and entry_price > 0:
     st.sidebar.error("Stop Loss must be below Entry Price for a Buy trade.")
-
 # --- UPDATED MANUAL DATABASE TEST (Line 93) ---
-        st.sidebar.markdown("---")
-        if st.sidebar.button("🧪 Log Test Signal"):
-            try:
-                # 1. Define a test market headline
-                test_headline = "NIFTY-50 hits record high as global markets rally on positive earnings."
+    st.sidebar.markdown("---")
+    if st.sidebar.button("🧪 Log Test Signal"):
+        try:
+            # 1. Define a test market headline
+            test_headline = "NIFTY-50 hits record high as global markets rally on positive earnings."
                 
-                # 2. Calculate AI Sentiment Score using our new function
-                score = get_market_sentiment(test_headline)
+             # 2. Calculate AI Sentiment Score using our new function
+             score = get_market_sentiment(test_headline)
                 
-                # 3. Log to database with the new sentiment_score field
-                db_manager.log_signal(
-                    ticker="NIFTY 50",
-                    signal_type="BUY",
-                    price=25181.80,
-                    sentiment=score, # This passes the AI score to SQL
-                    timeframe="5m"
-                )
-                st.sidebar.success(f"Signal Logged! AI Mood: {score}")
-                st.rerun()
-            except Exception as e:
-                st.sidebar.error(f"Test Log Failed: {e}")
-        # --- CLEAR DATABASE (Add at Line 107) ---
-        st.sidebar.markdown("---")
+             # 3. Log to database with the new sentiment_score field
+            db_manager.log_signal(
+                ticker="NIFTY 50",
+                signal_type="BUY",
+                price=25181.80,
+                sentiment=score,
+                timeframe="5m"
+            )
+            st.sidebar.success(f"Signal Logged! AI Mood: {score}")
+            st.rerun()
+        except Exception as e:
+            st.sidebar.error(f"Test Log Failed: {e}")
+
+        # --- CLEAR DATABASE (Line 114) ---
         if st.sidebar.button("🗑️ Clear All Test Data"):
             try:
                 db_manager.clear_all_data()
