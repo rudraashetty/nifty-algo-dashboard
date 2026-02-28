@@ -92,7 +92,7 @@ if entry_price > 0 and stop_loss > 0 and entry_price > stop_loss:
 elif entry_price <= stop_loss and entry_price > 0:
     st.sidebar.error("Stop Loss must be below Entry Price for a Buy trade.")
 
-# --- THE CHARTING FUNCTION (Must be outside the IF block) ---
+# --- THE CHARTING FUNCTION (MUST HAVE ZERO INDENTATION) ---
 def plot_advanced_chart(df: pd.DataFrame, ticker: str):
     fig = make_subplots(
         rows=3, cols=1, 
@@ -110,46 +110,37 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
         fig.add_trace(go.Scatter(x=df['Datetime'], y=df['BB_Upper'], name='BB Upper', line=dict(color='rgba(173, 216, 230, 0.4)', width=1)), row=1, col=1)
         fig.add_trace(go.Scatter(x=df['Datetime'], y=df['BB_Lower'], name='BB Lower', line=dict(color='rgba(173, 216, 230, 0.4)', width=1), fill='tonexty', fillcolor='rgba(173, 216, 230, 0.1)'), row=1, col=1)
 
-    # 2. Volume (Now properly visible)
+    # 2. Volume (Scaled Properly)
     if 'Volume' in df.columns:
         fig.add_trace(go.Bar(x=df['Datetime'], y=df['Volume'], name='Volume', marker_color='rgba(128, 128, 128, 0.4)'), row=1, col=1, secondary_y=True)
 
-    # 3. RSI & MACD
+    # 3. RSI
     if 'RSI_14' in df.columns:
         fig.add_trace(go.Scatter(x=df['Datetime'], y=df['RSI_14'].fillna(50), name="RSI", line=dict(color='purple')), row=2, col=1)
-    
-    return fig
-    if 'MACD' in df.columns and 'MACD_Signal' in df.columns:
-        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['MACD'].fillna(0), name="MACD", line=dict(color='blue')), row=3, col=1)
-        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['MACD_Signal'].fillna(0), name="Signal", line=dict(color='orange')), row=3, col=1)
-        fig.add_trace(go.Bar(x=df['Datetime'], y=df['MACD_Hist'].fillna(0), name="Histogram"), row=3, col=1)
+        fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
+        fig.add_hline(y=30, line_dash="dash", line_color="green", row=2, col=1)
 
-    fig.update_layout(height=800, template="plotly_dark", xaxis_rangeslider_visible=False)
+    # 4. MACD
+    if 'MACD' in df.columns:
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['MACD'].fillna(0), name="MACD", line=dict(color='blue')), row=3, col=1)
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['Signal_Line'].fillna(0), name="Signal", line=dict(color='orange')), row=3, col=1)
+
+    fig.update_layout(height=800, template="plotly_dark", xaxis_rangeslider_visible=False, showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
+# --- MAIN PAGE LOGIC ---
 if app_mode == "Live Intraday Tracker":
     st.title("🔴 Live Intraday Tracker")
-    
-    # 1. New Dropdown for Assets
-    ticker_choice = st.selectbox("Select Asset", 
-                                ["NIFTY 50 (^NSEI)", "RELIANCE (RELIANCE.NS)", "TCS (TCS.NS)", "HDFC BANK (HDFCBANK.NS)"])
-    
-    # 2. Extract the symbol correctly
+    ticker_choice = st.selectbox("Select Asset", ["NIFTY 50 (^NSEI)", "RELIANCE (RELIANCE.NS)", "TCS (TCS.NS)", "HDFC BANK (HDFCBANK.NS)"])
     selected_ticker = ticker_choice.split("(")[1].replace(")", "")
-    
     timeframe = st.selectbox("Interval", ["1m", "5m", "15m", "30m", "1h"], index=1)
     
     if st.button("Refresh Market Data"):
         with st.spinner(f"Fetching Live Data for {selected_ticker}..."):
-            # Use the selected_ticker variable here
             raw_df = fetcher.fetch_live_data(ticker=selected_ticker, interval=timeframe)
-            
-            # The code below must be indented exactly 12 spaces (3 tabs) from the left
             if raw_df is not None and not raw_df.empty:
                 df = TechnicalIndicators.add_all_indicators(raw_df)
                 latest = df.iloc[-1]
-                
-                # Metrics Display
                 m1, m2, m3, m4 = st.columns(4)
                 m1.metric("Current Price", f"₹{latest['Close']:.2f}")
                 m2.metric("RSI (14)", f"{latest.get('RSI_14', 50):.2f}")
@@ -157,41 +148,24 @@ if app_mode == "Live Intraday Tracker":
                 m4.metric("AI Bullish Confidence", f"{ml_model.predict_confidence(df)}%")
                 
                 plot_advanced_chart(df, ticker_choice.split(" (")[0])
-                
-                rsi_val = latest.get('RSI_14', 50)
-                if pd.notna(rsi_val):
-                    if rsi_val > 70:
-                        st.warning("⚠️ Overbought Signal Detected!")
-                        db_manager.log_signal("NIFTY50", "SELL", latest['Close'], timeframe, {"RSI": rsi_val})
-                        notifier.send_alert(f"🔴 *SELL ALERT* NIFTY50\nPrice: ₹{latest['Close']}\nRSI: {rsi_val:.2f}")
-                    elif rsi_val < 30:
-                        st.success("✅ Oversold Signal Detected!")
-                        db_manager.log_signal("NIFTY50", "BUY", latest['Close'], timeframe, {"RSI": rsi_val})
-                        notifier.send_alert(f"🟢 *BUY ALERT* NIFTY50\nPrice: ₹{latest['Close']}\nRSI: {rsi_val:.2f}")
-            else:
-                st.error("Failed to fetch market data.")
 
 elif app_mode == "Backtesting Engine":
     st.title("⚙️ Algorithmic Backtesting Engine")
     col1, col2 = st.columns(2)
     start_date = col1.date_input("Start Date", datetime(2023, 1, 1))
     end_date = col2.date_input("End Date", datetime.now())
-    
     if st.button("Run Backtest"):
         with st.spinner("Crunching historical data..."):
             hist_df = fetcher.fetch_historical_data(start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
             if hist_df is not None:
                 df_with_inds = TechnicalIndicators.add_all_indicators(hist_df)
                 results = BacktestEngine.run_macd_crossover(df_with_inds)
-                
                 st.subheader("Results (MACD Crossover)")
                 r1, r2, r3, r4 = st.columns(4)
                 r1.metric("Total Trades", results['total_trades'])
                 r2.metric("Win Rate", f"{results['win_rate']}%")
                 r3.metric("Max Drawdown", f"{results['max_drawdown']}%")
                 r4.metric("Total Return", f"{results['total_return']}%")
-                
-                db_manager.log_backtest_result("MACD Crossover", "NIFTY50", "1d", results['total_trades'], results['win_rate'], results['max_drawdown'], results['total_return'])
 
 elif app_mode == "Signal Database":
     st.title("🗄️ SQL Database Logs")
@@ -202,7 +176,8 @@ elif app_mode == "Signal Database":
     with tab2:
         logs = db_manager.get_backtest_history()
         if logs: st.dataframe(pd.DataFrame([l.to_dict() for l in logs]), use_container_width=True)
-# --- ADVANCED TECHNICAL INDICATORS (Professional Upgrade) ---
+
+# --- TECHNICAL INDICATORS CLASS ---
 class TechnicalIndicators:
     @staticmethod
     def add_rsi(df, window=14):
@@ -225,7 +200,6 @@ class TechnicalIndicators:
     def add_bollinger_bands(df, window=20, num_std=2):
         rolling_mean = df['Close'].rolling(window=window).mean()
         rolling_std = df['Close'].rolling(window=window).std()
-        df['BB_Middle'] = rolling_mean
         df['BB_Upper'] = rolling_mean + (rolling_std * num_std)
         df['BB_Lower'] = rolling_mean - (rolling_std * num_std)
         return df
