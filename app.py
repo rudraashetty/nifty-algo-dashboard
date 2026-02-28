@@ -195,10 +195,11 @@ elif app_mode == "Signal Database":
     tab1, tab2 = st.tabs(["Recent Signals", "Backtest History"])
     
     with tab1:
-        # Fetch signals and convert to data immediately
+        # Fetch and convert signals immediately while session is open
         signals = db_manager.get_recent_signals()
         
         if signals:
+            # Immediate dictionary conversion to prevent detachment
             signal_data = [s.to_dict() for s in signals]
             df_signals = pd.DataFrame(signal_data)
             st.dataframe(df_signals, use_container_width=True)
@@ -211,7 +212,7 @@ elif app_mode == "Signal Database":
             df_signals['timestamp'] = pd.to_datetime(df_signals['timestamp'])
             
             p1, p2, p3 = st.columns(3)
-            p1.metric("Total Signals Logged", len(df_signals))
+            p1.metric("Total Signals", len(df_signals))
             p2.metric("Buy Signals", len(df_signals[df_signals['type'] == 'BUY']))
             p3.metric("Sell Signals", len(df_signals[df_signals['type'] == 'SELL']))
             
@@ -221,9 +222,11 @@ elif app_mode == "Signal Database":
             st.info("No signals found in the database yet.")
 
     with tab2:
-        # Fetch backtest logs and convert immediately to prevent DetachedInstanceError
+        # Fetch backtest logs and convert immediately
         backtest_logs = db_manager.get_backtest_history()
+        
         if backtest_logs:
+            # CRITICAL FIX: Convert objects to data BEFORE the database session closes
             log_data = [l.to_dict() for l in backtest_logs]
             st.dataframe(pd.DataFrame(log_data), use_container_width=True)
         else:
