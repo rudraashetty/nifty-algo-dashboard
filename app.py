@@ -195,19 +195,20 @@ elif app_mode == "Signal Database":
     tab1, tab2 = st.tabs(["Recent Signals", "Backtest History"])
     
     with tab1:
-        # Fetch and convert signals immediately while session is open
-        signals = db_manager.get_recent_signals()
-        
-        if signals:
-            # Immediate dictionary conversion to prevent detachment
-            signal_data = [s.to_dict() for s in signals]
+        # Fetch and immediately convert to a list of dicts
+        raw_signals = db_manager.get_recent_signals()
+        if raw_signals:
+            # The list comprehension here extracts data while the session is live
+            signal_data = [dict(
+                id=s.id, ticker=s.ticker, type=s.type, 
+                price=s.price, timestamp=s.timestamp
+            ) for s in raw_signals]
+            
             df_signals = pd.DataFrame(signal_data)
             st.dataframe(df_signals, use_container_width=True)
             
-            # --- DAILY PERFORMANCE TRACKER ---
             st.markdown("---")
             st.subheader("📈 Daily Performance Summary")
-            
             df_signals['price'] = pd.to_numeric(df_signals['price'], errors='coerce')
             df_signals['timestamp'] = pd.to_datetime(df_signals['timestamp'])
             
@@ -222,12 +223,14 @@ elif app_mode == "Signal Database":
             st.info("No signals found in the database yet.")
 
     with tab2:
-        # Fetch backtest logs and convert immediately
-        backtest_logs = db_manager.get_backtest_history()
-        
-        if backtest_logs:
-            # CRITICAL FIX: Convert objects to data BEFORE the database session closes
-            log_data = [l.to_dict() for l in backtest_logs]
+        raw_logs = db_manager.get_backtest_history()
+        if raw_logs:
+            # Force extraction of all backtest fields immediately
+            log_data = [dict(
+                id=l.id, strategy=l.strategy, total_return=l.total_return,
+                win_rate=l.win_rate, timestamp=l.timestamp
+            ) for l in raw_logs]
+            
             st.dataframe(pd.DataFrame(log_data), use_container_width=True)
         else:
             st.info("No backtest history found.")
