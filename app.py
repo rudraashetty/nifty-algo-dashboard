@@ -195,42 +195,39 @@ elif app_mode == "Signal Database":
     tab1, tab2 = st.tabs(["Recent Signals", "Backtest History"])
     
     with tab1:
-        # Fetch and immediately convert to a list of dicts
-        raw_signals = db_manager.get_recent_signals()
-        if raw_signals:
-            # The list comprehension here extracts data while the session is live
+        signals = db_manager.get_recent_signals()
+        if signals:
+            # Displaying signals using correct database fields
             signal_data = [dict(
-                id=s.id, ticker=s.ticker, type=s.type, 
-                price=s.price, timestamp=s.timestamp
-            ) for s in raw_signals]
-            
+                ID=s.id, Ticker=s.ticker, Type=s.signal_type, 
+                Price=s.price, Time=s.timestamp
+            ) for s in signals]
             df_signals = pd.DataFrame(signal_data)
             st.dataframe(df_signals, use_container_width=True)
             
             st.markdown("---")
             st.subheader("📈 Daily Performance Summary")
-            df_signals['price'] = pd.to_numeric(df_signals['price'], errors='coerce')
-            df_signals['timestamp'] = pd.to_datetime(df_signals['timestamp'])
+            df_signals['Price'] = pd.to_numeric(df_signals['Price'], errors='coerce')
+            df_signals['Time'] = pd.to_datetime(df_signals['Time'])
             
             p1, p2, p3 = st.columns(3)
             p1.metric("Total Signals", len(df_signals))
-            p2.metric("Buy Signals", len(df_signals[df_signals['type'] == 'BUY']))
-            p3.metric("Sell Signals", len(df_signals[df_signals['type'] == 'SELL']))
+            p2.metric("Buy Signals", len(df_signals[df_signals['Type'] == 'BUY']))
+            p3.metric("Sell Signals", len(df_signals[df_signals['Type'] == 'SELL']))
             
-            daily_counts = df_signals.resample('D', on='timestamp').size()
+            daily_counts = df_signals.resample('D', on='Time').size()
             st.line_chart(daily_counts, use_container_width=True)
         else:
             st.info("No signals found in the database yet.")
 
     with tab2:
-        raw_logs = db_manager.get_backtest_history()
-        if raw_logs:
-            # Force extraction of all backtest fields immediately
+        backtest_logs = db_manager.get_backtest_history()
+        if backtest_logs:
+            # Using specific fields from your Backtest class to avoid AttributeError
             log_data = [dict(
-                id=l.id, strategy=l.strategy, total_return=l.total_return,
-                win_rate=l.win_rate, timestamp=l.timestamp
-            ) for l in raw_logs]
-            
+                ID=l.id, Ticker=l.ticker, Result=l.price, 
+                Timeframe=l.timeframe, Date=l.timestamp
+            ) for l in backtest_logs]
             st.dataframe(pd.DataFrame(log_data), use_container_width=True)
         else:
             st.info("No backtest history found.")
