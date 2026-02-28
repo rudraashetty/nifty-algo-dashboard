@@ -92,7 +92,7 @@ if entry_price > 0 and stop_loss > 0 and entry_price > stop_loss:
 elif entry_price <= stop_loss and entry_price > 0:
     st.sidebar.error("Stop Loss must be below Entry Price for a Buy trade.")
 def plot_advanced_chart(df: pd.DataFrame, ticker: str):
- fig = make_subplots(
+    fig = make_subplots(
         rows=3, cols=1, 
         shared_xaxes=True, 
         vertical_spacing=0.05,
@@ -101,8 +101,7 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
         specs=[[{"secondary_y": True}], [{"secondary_y": False}], [{"secondary_y": False}]]
     )
 
-    fig.add_trace(go.Candlestick(x=df['Datetime'], open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'], name='Price'), row=1, col=1) 
-# --- 1. ADD BOLLINGER BANDS (Overlay on Price) ---
+    fig.add_trace(go.Candlestick(x=df['Datetime'], open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'], name='Price'), row=1, col=1)# --- 1. ADD BOLLINGER BANDS (Overlay on Price) ---
     if 'BB_Upper' in df.columns:
         fig.add_trace(go.Scatter(x=df['Datetime'], y=df['BB_Upper'], 
                                  name='BB Upper', line=dict(color='rgba(173, 216, 230, 0.4)', width=1)), row=1, col=1)
