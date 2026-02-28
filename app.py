@@ -101,25 +101,21 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
         specs=[[{"secondary_y": True}], [{"secondary_y": False}], [{"secondary_y": False}]]
     )
 
-    fig.add_trace(go.Candlestick(x=df['Datetime'], open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'], name='Price'), row=1, col=1)# --- 1. ADD BOLLINGER BANDS (Overlay on Price) ---
-    if 'BB_Upper' in df.columns:
-        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['BB_Upper'], 
-                                 name='BB Upper', line=dict(color='rgba(173, 216, 230, 0.4)', width=1)), row=1, col=1)
-        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['BB_Lower'], 
-                                 name='BB Lower', line=dict(color='rgba(173, 216, 230, 0.4)', width=1),
-                                 fill='tonexty', fillcolor='rgba(173, 216, 230, 0.1)'), row=1, col=1)
+    # 1. Main Price & Bollinger Bands
+    fig.add_trace(go.Candlestick(x=df['Datetime'], open=df['Open'], high=df['High'], low=df['Low'], close=df['Close'], name='Price'), row=1, col=1)
+    
+    if 'BB_Upper' in df.columns and 'BB_Lower' in df.columns:
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['BB_Upper'], name='BB Upper', line=dict(color='rgba(173, 216, 230, 0.4)', width=1)), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['BB_Lower'], name='BB Lower', line=dict(color='rgba(173, 216, 230, 0.4)', width=1), fill='tonexty', fillcolor='rgba(173, 216, 230, 0.1)'), row=1, col=1)
 
-    # --- 2. ADD VOLUME ANALYSIS (Bottom Bars) ---
-   # --- 2. ADD VOLUME ANALYSIS (Professional Overlay) ---
-   if 'Volume' in df.columns:
-        fig.add_trace(go.Bar(
-            x=df['Datetime'], y=df['Volume'], name='Volume', 
-            marker_color='rgba(128, 128, 128, 0.4)'
-        ), row=1, col=1, secondary_y=True) # Adding this makes the bars visible!
-        if 'RSI_14' in df.columns:
-            fig.add_trace(go.Scatter(x=df['Datetime'], y=df['RSI_14'].fillna(50), name="RSI", line=dict(color='purple')), row=2, col=1)
-            fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
-            fig.add_hline(y=30, line_dash="dash", line_color="green", row=2, col=1)
+    # 2. Volume (Properly Scaled)
+    if 'Volume' in df.columns:
+        fig.add_trace(go.Bar(x=df['Datetime'], y=df['Volume'], name='Volume', marker_color='rgba(128, 128, 128, 0.4)'), row=1, col=1, secondary_y=True)
+
+    # 3. RSI
+    if 'RSI_14' in df.columns:
+        fig.add_trace(go.Scatter(x=df['Datetime'], y=df['RSI_14'].fillna(50), name="RSI", line=dict(color='purple')), row=2, col=1)fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
+        fig.add_hline(y=30, line_dash="dash", line_color="green", row=2, col=1)
 
     if 'MACD' in df.columns and 'MACD_Signal' in df.columns:
         fig.add_trace(go.Scatter(x=df['Datetime'], y=df['MACD'].fillna(0), name="MACD", line=dict(color='blue')), row=3, col=1)
