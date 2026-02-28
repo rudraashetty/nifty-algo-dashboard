@@ -90,20 +90,21 @@ if entry_price > 0 and stop_loss > 0 and entry_price > stop_loss:
     st.sidebar.warning(f"Total Trade Value: ₹{quantity * entry_price:.2f}")
 elif entry_price <= stop_loss and entry_price > 0:
     st.sidebar.error("Stop Loss must be below Entry Price for a Buy trade.")
-    # --- MANUAL DATABASE TEST (Add at Line 93) ---
-        st.sidebar.markdown("---")
-        if st.sidebar.button("🧪 Log Test Signal"):
-            try:
-                db_manager.log_signal(
-                    ticker="NIFTY 50",
-                    signal_type="BUY",
-                    price=25181.80,
-                    timeframe="5m"
-                )
-                st.sidebar.success("Test signal logged!")
-                st.rerun()
-            except Exception as e:
-                st.sidebar.error(f"Test Log Failed: {e}")
+# --- MANUAL DATABASE TEST (Add at Line 93) ---
+st.sidebar.markdown("---")
+if st.sidebar.button("🧪 Log Test Signal"):
+    try:
+        db_manager.log_signal(
+             ticker="NIFTY 50",
+             signal_type="BUY",
+             price=25181.80,
+             timeframe="5m"
+       )
+       st.sidebar.success("Test signal logged!")
+       st.rerun()
+   except Exception as e:
+       st.sidebar.error(f"Test Log Failed: {e}")
+
         # --- Strategy Key (Add at Line 94) ---
 with st.sidebar.expander("📊 Strategy Key"):
     st.markdown("""
