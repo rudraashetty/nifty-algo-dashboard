@@ -190,41 +190,44 @@ elif app_mode == "Backtesting Engine":
                 r2.metric("Win Rate", f"{results['win_rate']}%")
                 r3.metric("Max Drawdown", f"{results['max_drawdown']}%")
                 r4.metric("Total Return", f"{results['total_return']}%")
-
 elif app_mode == "Signal Database":
     st.title("🗄️ SQL Database Logs")
     tab1, tab2 = st.tabs(["Recent Signals", "Backtest History"])
+    
     with tab1:
-        # --- DAILY PERFORMANCE TRACKER (Inside Tab 1) ---
+        # --- FIX: Move the fetch to the TOP of the tab ---
+        signals = db_manager.get_recent_signals()
+        
         if signals:
+            # Display the raw data table first
+            df_signals = pd.DataFrame([s.to_dict() for s in signals])
+            st.dataframe(df_signals, use_container_width=True)
+            
+            # --- DAILY PERFORMANCE TRACKER ---
             st.markdown("---")
             st.subheader("📈 Daily Performance Summary")
-            df_signals = pd.DataFrame([s.to_dict() for s in signals])
             
-            # Ensure price columns are numeric for calculation
-            df_signals['price'] = pd.to_numeric(df_signals['price'])
-            
-            # Simple P/L logic based on signal type
-            # Note: This is a placeholder logic for your specific trade execution
-            total_signals = len(df_signals)
-            buy_count = len(df_signals[df_signals['type'] == 'BUY'])
-            sell_count = len(df_signals[df_signals['type'] == 'SELL'])
+            # Ensure data types are correct for calculation
+            df_signals['price'] = pd.to_numeric(df_signals['price'], errors='coerce')
+            df_signals['timestamp'] = pd.to_datetime(df_signals['timestamp'])
             
             p1, p2, p3 = st.columns(3)
-            p1.metric("Total Signals Logged", total_signals)
-            p2.metric("Buy Signals", buy_count, delta_color="normal")
-            p3.metric("Sell Signals", sell_count, delta_color="inverse")
+            p1.metric("Total Signals Logged", len(df_signals))
+            p2.metric("Buy Signals", len(df_signals[df_signals['type'] == 'BUY']))
+            p3.metric("Sell Signals", len(df_signals[df_signals['type'] == 'SELL']))
             
-            # Daily Trend Chart
-            df_signals['timestamp'] = pd.to_datetime(df_signals['timestamp'])
+            # Activity Chart
             daily_counts = df_signals.resample('D', on='timestamp').size()
             st.line_chart(daily_counts, use_container_width=True)
-        signals = db_manager.get_recent_signals()
-        if signals: st.dataframe(pd.DataFrame([s.to_dict() for s in signals]), use_container_width=True)
+        else:
+            st.info("No signals found in the database yet.")
+
     with tab2:
         logs = db_manager.get_backtest_history()
-        if logs: st.dataframe(pd.DataFrame([l.to_dict() for l in logs]), use_container_width=True)
-
+        if logs:
+            st.dataframe(pd.DataFrame([l.to_dict() for l in logs]), use_container_width=True)
+        else:
+            st.info("No backtest history found.")
 # --- TECHNICAL INDICATORS CLASS ---
 class TechnicalIndicators:
     @staticmethod
