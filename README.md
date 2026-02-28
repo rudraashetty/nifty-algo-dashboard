@@ -1,39 +1,51 @@
-📈 Dev Canvas Trading Engine: NIFTY-50 Intraday Analytics
-Developed by Rudra Shetty | AI & Machine Learning Specialization
+# 💹 Dev Canvas Trading Engine: NIFTY-50 Analytics
+### **Developed by Rudra Shetty**
+**B.E. Computer Science (Artificial Intelligence & Machine Learning)**
+*Mangalore Institute of Technology & Engineering (MITE)*
 
-A high-performance, full-stack trading dashboard built with Streamlit and SQLAlchemy for real-time intraday market analysis and automated signal logging. This engine integrates technical indicators with a robust database backend to track trading performance over time.
+---
 
-🚀 Key Features
-Live Intraday Tracker: Real-time Nifty-50 data visualization with automated MACD Bullish/Bearish Crossover detection.
+## 🌟 Overview
+The **Dev Canvas Trading Engine** is a sophisticated, full-stack financial dashboard designed for real-time **NIFTY-50** market analysis. It leverages **Python** and **SQLAlchemy** to bridge the gap between live market data and persistent performance tracking.
 
-Predictive Analytics: Integrated technical indicators including Bollinger Bands (20, 2) and RSI (14) for trend strength validation.
+---
 
-SQL Database Logs: Persistent storage for all generated signals and backtest results using PostgreSQL (Production) and SQLite (Development).
+## 🚀 Core Features
+* **📡 Live Intraday Tracker**: Real-time candle charts with automated **MACD Bullish/Bearish** crossover detection.
+* **📊 SQL Analytics Suite**: Persistent logging of every trade signal using a robust **PostgreSQL/SQLite** backend.
+* **📈 Performance Dashboard**: Interactive metrics calculating **Total Trades**, **Buy/Sell Ratios**, and daily activity trends.
+* **⚖️ Advanced Risk Management**: Built-in calculator for **Position Sizing** based on custom capital and risk-per-trade.
+* **🧠 Predictive Indicators**: Multi-indicator validation using **Bollinger Bands (20, 2)** and **RSI (14)**.
 
-Daily Performance Summary: Interactive UI cards and charts that calculate total trades, buy/sell ratios, and daily activity trends.
+---
 
-Risk Management Suite: A built-in calculator that determines optimal Position Sizing based on custom capital and risk percentages.
+## 🛠️ Technical Stack
+| Category | Technology |
+| :--- | :--- |
+| **Frontend** | **Streamlit** (Interactive Web UI) |
+| **Backend** | **Python** & **SQLAlchemy ORM** |
+| **Database** | **PostgreSQL** (Production) / **SQLite** (Dev) |
+| **Analysis** | **Pandas**, **NumPy**, **yfinance** |
+| **Visuals** | **Plotly** (Multi-axis Candlestick Charts) |
 
-💻 Technical Stack
-Frontend: Streamlit (Python-based Web Framework).
+---
 
-Backend & Database: SQLAlchemy ORM for robust database session management and signal persistence.
+## 🏗️ Architectural Engineering
+To ensure high availability, this project solves several common production challenges:
+1. **Memory Persistence**: Implements `expire_on_commit=False` in the SQLAlchemy session to prevent `DetachedInstanceError` during high-frequency UI updates.
+2. **Schema Stability**: Uses a "Safe-Fetch" layer with Python's `getattr` to ensure the UI never crashes if the database schema evolves.
+3. **Real-time Concurrency**: Optimized for the **Streamlit** execution model to handle live price streams alongside database writes.
 
-Data Processing: Pandas & NumPy for vectorized technical indicator calculations.
+---
 
-Visualization: Plotly for interactive, multi-axis candlestick charting.
+## 📁 Repository Structure
+* `app.py`: Main dashboard logic and UI components.
+* `database.py`: SQL models and automated `DatabaseManager`.
+* `trading_logic.py`: Vectorized technical indicators and backtest engine.
 
-Real-time Data: Integrated via yfinance for high-fidelity market snapshots.
+---
 
-🛠️ Architecture Highlights
-To ensure production stability, this engine utilizes a non-expiring database session (expire_on_commit=False) to prevent DetachedInstanceError during high-frequency data reads. It also features a "Safe-Check" data extraction layer using getattr to maintain UI stability even with evolving database schemas.
+## 🎓 About the Developer
+I am a **7th-semester B.E. student** specializing in **Artificial Intelligence and Machine Learning**. My portfolio includes **NeuroVocal AI** (Deep Learning for Disease Detection) and **AuditFlow** (Automated Technical Debt Auditor). I am currently applying my skills as an intern at **Course5 Intelligence (C5i)**.
 
-📁 Project Structure
-Plaintext
-├── app.py              # Main Streamlit UI and Module Logic
-├── database.py         # SQLAlchemy Models and DatabaseManager Class
-├── trading_logic.py    # Indicator classes and Backtest Engine
-├── requirements.txt    # Project dependencies
-└── trading_dashboard.db# Local SQLite development database
-🎓 Academic & Professional Context
-This project was developed as part of my 7th-semester BE in Computer Science (AI & ML) at Mangalore Institute of Technology & Engineering (MITE). It builds upon my previous experience developing AuditFlow (Technical Debt Auditor) and NeuroVocal AI (Deep Learning for Disease Classification).
+---
