@@ -10,7 +10,6 @@ try:
 except ImportError as e:
     st.error(f"Critical Dependency Error: {e}")
     st.stop()
-
 st.set_page_config(page_title="NIFTY 50 Algo Dashboard", layout="wide", page_icon="📈")
 # --- CUSTOM HEADER & BRANDING ---
 st.markdown(f"""
