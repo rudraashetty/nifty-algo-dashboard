@@ -197,11 +197,16 @@ elif app_mode == "Signal Database":
     with tab1:
         signals = db_manager.get_recent_signals()
         if signals:
-            # Displaying signals using correct database fields
-            signal_data = [dict(
-                ID=s.id, Ticker=s.ticker, Type=s.signal_type, 
-                Price=s.price, Time=s.timestamp
-            ) for s in signals]
+            # Safe extraction using names from your database.py classes
+            signal_data = []
+            for s in signals:
+                signal_data.append({
+                    "ID": getattr(s, 'id', 'N/A'),
+                    "Ticker": getattr(s, 'ticker', 'N/A'),
+                    "Type": getattr(s, 'signal_type', 'N/A'),
+                    "Price": getattr(s, 'price', 0.0),
+                    "Time": getattr(s, 'timestamp', 'N/A')
+                })
             df_signals = pd.DataFrame(signal_data)
             st.dataframe(df_signals, use_container_width=True)
             
@@ -223,11 +228,16 @@ elif app_mode == "Signal Database":
     with tab2:
         backtest_logs = db_manager.get_backtest_history()
         if backtest_logs:
-            # Using specific fields from your Backtest class to avoid AttributeError
-            log_data = [dict(
-                ID=l.id, Ticker=l.ticker, Result=l.price, 
-                Timeframe=l.timeframe, Date=l.timestamp
-            ) for l in backtest_logs]
+            # Safe extraction for backtest logs
+            log_data = []
+            for l in backtest_logs:
+                log_data.append({
+                    "ID": getattr(l, 'id', 'N/A'),
+                    "Ticker": getattr(l, 'ticker', 'N/A'),
+                    "Price": getattr(l, 'price', 'N/A'),
+                    "Timeframe": getattr(l, 'timeframe', 'N/A'),
+                    "Date": getattr(l, 'timestamp', 'N/A')
+                })
             st.dataframe(pd.DataFrame(log_data), use_container_width=True)
         else:
             st.info("No backtest history found.")
