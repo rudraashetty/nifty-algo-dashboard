@@ -46,6 +46,6 @@ To ensure high availability, this project solves several common production chall
 ---
 
 ## 🎓 About the Developer
-I am a **7th-semester B.E. student** specializing in **Artificial Intelligence and Machine Learning**. My portfolio includes and **AuditFlow** (Automated Technical Debt Auditor). I am currently applying my skills as an intern at **Reverse Engineering Infotec**.
+I am a **7th-semester B.E. student** specializing in **[CS-IOT & CyberSecurity also an AI tools Enthusiast]**. My portfolio includes and **AuditFlow** (Automated Technical Debt Auditor). I am currently applying my skills as an intern at **Reverse Engineering Infotec**.
 
 ---
