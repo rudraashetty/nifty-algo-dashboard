@@ -12,6 +12,13 @@ Access the live dashboard here: https://nifty-algo-dashboard-hmnn6kvm3sjpw4us6gb
 * **AI Confidence Score**: Integrated machine learning model to predict bullish/bearish market confidence.
 * **Automated Alerts**: Secure Discord integration for 24/7 trade signal notifications.
 * **Mobile-First Design**: Includes a built-in QR code for instant mobile access and monitoring.
+* Real-time Market Tracking: Integrated with MACD and Bollinger Band indicators.
+
+Automated SQL Logging: A stable database system that survives session timeouts.
+
+Risk Management: A built-in calculator for position sizing.
+
+Advanced Analytics: A daily P/L and activity tracker.
 
 ## 🛠️ Tech Stack
 * **Language**: Python 3.11+
