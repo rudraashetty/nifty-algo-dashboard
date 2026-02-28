@@ -128,6 +128,21 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
         signal_col = 'Signal_Line' if 'Signal_Line' in df.columns else 'MACD_Signal'
         if signal_col in df.columns:
             fig.add_trace(go.Scatter(x=df['Datetime'], y=df[signal_col].fillna(0), name="Signal", line=dict(color='orange')), row=3, col=1)
+   # --- 5. BUY/SELL SIGNAL MARKERS (Add at Line 131) ---
+    if 'MACD' in df.columns and signal_col in df.columns:
+        # Logic: MACD crosses above Signal (Buy) or below Signal (Sell)
+        buy_signals = df[(df['MACD'] > df[signal_col]) & (df['MACD'].shift(1) <= df[signal_col].shift(1))]
+        sell_signals = df[(df['MACD'] < df[signal_col]) & (df['MACD'].shift(1) >= df[signal_col].shift(1))]
+
+        # Green Up-Arrows for Buy Signals
+        fig.add_trace(go.Scatter(x=buy_signals['Datetime'], y=buy_signals['Low'] * 0.98,
+                                 mode='markers', name='Buy Signal',
+                                 marker=dict(symbol='triangle-up', size=12, color='#00FF00')), row=1, col=1)
+
+        # Red Down-Arrows for Sell Signals
+        fig.add_trace(go.Scatter(x=sell_signals['Datetime'], y=sell_signals['High'] * 1.02,
+                                 mode='markers', name='Sell Signal',
+                                 marker=dict(symbol='triangle-down', size=12, color='#FF0000')), row=1, col=1)
     fig.update_layout(height=800, template="plotly_dark", xaxis_rangeslider_visible=False, showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
