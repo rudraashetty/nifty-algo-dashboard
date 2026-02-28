@@ -195,19 +195,19 @@ elif app_mode == "Signal Database":
     tab1, tab2 = st.tabs(["Recent Signals", "Backtest History"])
     
     with tab1:
-        # --- FIX: Move the fetch to the TOP of the tab ---
+        # Fetch signals immediately
         signals = db_manager.get_recent_signals()
         
         if signals:
-            # Display the raw data table first
-            df_signals = pd.DataFrame([s.to_dict() for s in signals])
+            # Convert to a list of dicts right away to avoid DetachedInstanceError
+            signal_data = [s.to_dict() for s in signals]
+            df_signals = pd.DataFrame(signal_data)
             st.dataframe(df_signals, use_container_width=True)
             
             # --- DAILY PERFORMANCE TRACKER ---
             st.markdown("---")
             st.subheader("📈 Daily Performance Summary")
             
-            # Ensure data types are correct for calculation
             df_signals['price'] = pd.to_numeric(df_signals['price'], errors='coerce')
             df_signals['timestamp'] = pd.to_datetime(df_signals['timestamp'])
             
@@ -216,16 +216,18 @@ elif app_mode == "Signal Database":
             p2.metric("Buy Signals", len(df_signals[df_signals['type'] == 'BUY']))
             p3.metric("Sell Signals", len(df_signals[df_signals['type'] == 'SELL']))
             
-            # Activity Chart
             daily_counts = df_signals.resample('D', on='timestamp').size()
             st.line_chart(daily_counts, use_container_width=True)
         else:
             st.info("No signals found in the database yet.")
 
     with tab2:
-        logs = db_manager.get_backtest_history()
-        if logs:
-            st.dataframe(pd.DataFrame([l.to_dict() for l in logs]), use_container_width=True)
+        # Fetch backtest logs and convert them immediately
+        backtest_logs = db_manager.get_backtest_history()
+        if backtest_logs:
+            # FIX: Convert objects to data before the session closes
+            log_data = [l.to_dict() for l in backtest_logs]
+            st.dataframe(pd.DataFrame(log_data), use_container_width=True)
         else:
             st.info("No backtest history found.")
 # --- TECHNICAL INDICATORS CLASS ---
