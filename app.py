@@ -105,10 +105,16 @@ def plot_advanced_chart(df: pd.DataFrame, ticker: str):
                                  fill='tonexty', fillcolor='rgba(173, 216, 230, 0.1)'), row=1, col=1)
 
     # --- 2. ADD VOLUME ANALYSIS (Bottom Bars) ---
+   # --- 2. ADD VOLUME ANALYSIS (Professional Overlay) ---
     if 'Volume' in df.columns:
-        fig.add_trace(go.Bar(x=df['Datetime'], y=df['Volume'], name='Volume', 
-                             marker_color='rgba(128, 128, 128, 0.2)'), row=1, col=1)
-    if 'RSI_14' in df.columns:
+        fig.add_trace(go.Bar(
+            x=df['Datetime'], 
+            y=df['Volume'], 
+            name='Volume', 
+            marker_color='rgba(128, 128, 128, 0.4)', # Increased visibility
+            showlegend=True
+        ), row=1, col=1)
+        if 'RSI_14' in df.columns:
         fig.add_trace(go.Scatter(x=df['Datetime'], y=df['RSI_14'].fillna(50), name="RSI", line=dict(color='purple')), row=2, col=1)
         fig.add_hline(y=70, line_dash="dash", line_color="red", row=2, col=1)
         fig.add_hline(y=30, line_dash="dash", line_color="green", row=2, col=1)
