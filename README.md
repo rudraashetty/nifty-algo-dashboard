@@ -1,6 +1,6 @@
 # 💹 Dev Canvas Trading Engine: NIFTY-50 Analytics
 ### **Developed by Rudra Shetty**
-**B.E. Computer Science (Artificial Intelligence & Machine Learning)**
+**B.E. Computer Science (CS-IOT & CyberSecurity also an AI tools Enthusiast)**
 *Mangalore Institute of Technology & Engineering (MITE)*
 
 ---
@@ -46,6 +46,6 @@ To ensure high availability, this project solves several common production chall
 ---
 
 ## 🎓 About the Developer
-I am a **7th-semester B.E. student** specializing in **Artificial Intelligence and Machine Learning**. My portfolio includes **NeuroVocal AI** (Deep Learning for Disease Detection) and **AuditFlow** (Automated Technical Debt Auditor). I am currently applying my skills as an intern at **Course5 Intelligence (C5i)**.
+I am a **7th-semester B.E. student** specializing in **Artificial Intelligence and Machine Learning**. My portfolio includes **NeuroVocal AI** (Deep Learning for Disease Detection) and **AuditFlow** (Automated Technical Debt Auditor). I am currently applying my skills as an intern at **Reverse Engineering Infotec**.
 
 ---
