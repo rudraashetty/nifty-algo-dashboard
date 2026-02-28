@@ -104,6 +104,15 @@ if st.sidebar.button("🧪 Log Test Signal"):
         st.rerun()
     except Exception as e:
         st.sidebar.error(f"Test Log Failed: {e}")
+        # --- CLEAR DATABASE (Add at Line 107) ---
+        st.sidebar.markdown("---")
+        if st.sidebar.button("🗑️ Clear All Test Data"):
+            try:
+                db_manager.clear_all_data()
+                st.sidebar.warning("All database logs deleted!")
+                st.rerun()
+            except Exception as e:
+                st.sidebar.error(f"Clear Failed: {e}")
         # --- Strategy Key (Add at Line 94) ---
 with st.sidebar.expander("📊 Strategy Key"):
     st.markdown("""
