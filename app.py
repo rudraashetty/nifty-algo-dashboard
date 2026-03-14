@@ -11,10 +11,10 @@ from textblob import TextBlob
 import io
 import segno
 
-# 1. Page Configuration (Must be the first Streamlit command)
+# Configure the page first
 st.set_page_config(page_title="NIFTY 50 Algo Dashboard", layout="wide", page_icon="📈")
 
-# 2. Custom Header & Branding
+# --- CUSTOM HEADER & BRANDING ---
 st.markdown(f"""
     <div style="text-align: center; padding: 10px; border-bottom: 2px solid #4CAF50; margin-bottom: 20px;">
         <h1 style="color: #4CAF50; margin-bottom: 0;">📈 Dev Canvas Trading Engine</h1>
