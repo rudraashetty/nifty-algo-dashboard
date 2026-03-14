@@ -97,10 +97,10 @@ elif entry_price <= stop_loss and entry_price > 0:
                 # 1. Define a test market headline
                 test_headline = "NIFTY-50 hits record high as global markets rally on positive earnings."
                 
-                # 2. Calculate AI Sentiment Score using our new function
+                # 2. Calculate AI Sentiment Score
                 score = get_market_sentiment(test_headline)
                 
-                # 3. Log to database with the new sentiment_score field
+                # 3. Log to database
                 db_manager.log_signal(
                     ticker="NIFTY 50",
                     signal_type="BUY",
@@ -113,18 +113,7 @@ elif entry_price <= stop_loss and entry_price > 0:
             except Exception as e:
                 st.sidebar.error(f"Test Log Failed: {e}")
 
-        # --- CLEAR DATABASE (Line 114) ---
-        if st.sidebar.button("🗑️ Clear All Test Data"):
-            try:
-                db_manager.clear_all_data()
-                st.sidebar.warning("All database logs deleted!")
-                st.rerun()
-            except Exception as e:
-                st.sidebar.error(f"Clear Failed: {e}")
-        except Exception as e:
-            st.sidebar.error(f"Test Log Failed: {e}")
-
-        # --- CLEAR DATABASE (Line 114) ---
+        # --- CLEAR DATABASE (Line 115) ---
         if st.sidebar.button("🗑️ Clear All Test Data"):
             try:
                 db_manager.clear_all_data()
