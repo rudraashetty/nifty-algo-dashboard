@@ -1,10 +1,15 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
+import yfinance as yf
 import plotly.graph_objects as go
-from textblob import TextBlob
 from plotly.subplots import make_subplots
-from datetime import datetime
-
+from datetime import datetime, timedelta
+import time
+from database import db_manager
+from textblob import TextBlob
+import io
+import segno
 try:
     from database import db_manager
     from trading_logic import DataFetcher, TechnicalIndicators, BacktestEngine, DiscordNotifier, PredictiveModel
